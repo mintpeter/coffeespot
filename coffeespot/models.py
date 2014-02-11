@@ -15,14 +15,10 @@ from sqlalchemy.orm import (
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
+import time
+
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
-
-class Users(Base):
-    __tablename__ = 'users'
-    id = Column(Integer)
-    name = Column(Text)
-    
 
 class Posts(Base):
     __tablename__ = 'posts'
@@ -35,5 +31,6 @@ class Posts(Base):
     def __init__(self, id, title, authorid, post):
         self.id = id
         self.title = title
+        self.date = time.time()
         self.authorid = authorid
         self.post = post

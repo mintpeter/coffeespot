@@ -14,6 +14,7 @@ from pyramid.scripts.common import parse_vars
 from ..models import (
     DBSession,
     Posts,
+    Users,
     Base
     )
 
@@ -36,5 +37,5 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        post = Posts(title="Title", authorid=1, post = "Blah blah blah.")
+        post = Users(name=u'Zack', group=0)
         DBSession.add(post)

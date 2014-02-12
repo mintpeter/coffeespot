@@ -3,7 +3,8 @@ from sqlalchemy import (
     Float,
     Index,
     Integer,
-    Text
+    Text,
+    Unicode
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,6 +20,16 @@ import time
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
+
+class Users(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    group = Column(Integer)
+
+    def __init__(self, name, group):
+        self.name = name
+        self.group = group
 
 class Posts(Base):
     __tablename__ = 'posts'

@@ -22,4 +22,6 @@ coffeespot/static/pyramid-16x16.png
 coffeespot/static/pyramid.png
 coffeespot/static/theme.css
 coffeespot/static/theme.min.css
+coffeespot/templates/base.mako
+coffeespot/templates/home.mako
 coffeespot/templates/mytemplate.pt

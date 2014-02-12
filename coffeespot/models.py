@@ -26,10 +26,12 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
     group = Column(Integer)
+    password = Column(Unicode)
 
-    def __init__(self, name, group):
+    def __init__(self, name, group, password):
         self.name = name
         self.group = group
+        self.password = password
 
 class Posts(Base):
     __tablename__ = 'posts'

@@ -36,6 +36,5 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-    with transaction.manager:
-        post = Users(name=u'Zack', group=0)
-        DBSession.add(post)
+#    with transaction.manager:
+#        DBSession.add(user)

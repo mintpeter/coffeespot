@@ -1,8 +1,8 @@
 from sqlalchemy import (
     Column,
+    Float,
     Index,
     Integer,
-    Interval,
     Text
     )
 
@@ -23,13 +23,12 @@ Base = declarative_base()
 class Posts(Base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
-    date = Column(Interval)
+    date = Column(Float)
     title = Column(Text)
     authorid = Column(Integer)
     post = Column(Text)
     
-    def __init__(self, id, title, authorid, post):
-        self.id = id
+    def __init__(self, title, authorid, post):
         self.title = title
         self.date = time.time()
         self.authorid = authorid

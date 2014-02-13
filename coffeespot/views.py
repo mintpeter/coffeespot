@@ -1,21 +1,28 @@
 #from pyramid.response import Response
 from pyramid.renderers import render_to_response
-from pyramid.view import view_config
+from pyramid.view import (view_config,
+                          forbidden_view_config,
+                          notfound_view_config)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.security import remember, forget, authenticated_userid
 
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
     DBSession,
-    Posts
+    Posts,
+    Users
     )
 
+import transaction
+
+from .security import verify_password
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
     posts = DBSession.query(Posts).all()
     
-    return {'posts': posts}
+    return {'posts': posts, 'username': authenticated_userid(request)}
     
 #    return {'title': 'home'}
 #    try:
@@ -23,6 +30,7 @@ def home(request):
 #    except DBAPIError:
 #        return Response(conn_err_msg, content_type='text/plain', status_int=500)
 #    return {'one': one, 'project': 'coffeespot'}
+
 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -40,3 +48,59 @@ After you fix the problem, please restart the Pyramid application to
 try it again.
 """
 
+
+@view_config(route_name='login', renderer='login.mako')
+@forbidden_view_config(renderer='login.mako')
+def login(request):
+    login_url = request.route_url('login')
+    referrer = request.url
+    if login_url == referrer:
+        referrer = '/'
+    came_from = request.params.get('came_from', referrer)
+    if 'submitted' in request.params:
+        username = request.params.get('username')
+        password = request.params.get('password')
+        if verify_password(username, password):
+            headers = remember(request, username)
+            return HTTPFound(location=came_from, headers=headers)
+        else:
+            message = 'Incorrect login information.'
+            return {'message': message,
+                    'username': username,
+                    'came_from': came_from,
+                    'url': request.route_url('login')
+                    }
+    else:
+        return {'message': '',
+                'username': '',
+                'came_from': came_from,
+                'url': request.route_url('login')
+                }
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(location=request.route_url('home'), headers=headers)
+
+@view_config(route_name='new_post', renderer='new_post.mako',
+             permission='edit')
+def new_post(request):
+    if 'submitted' in request.params:
+        title = request.params.get('title')
+        users_db = DBSession.query(Users)
+        author = users_db.filter(Users.name == authenticated_userid(request))
+        post_content = request.params.get('post_content')
+        new_post = Posts(title=title,
+                         authorid=author.first().id,
+                         post=post_content)
+        with transaction.manager:
+            DBSession.add(new_post)
+        return {'message': 'Post successfully added.', 'post': post_content}
+    else:
+        return {'message': '',
+                'post': '',
+                'url': request.route_url('new_post')}
+
+@notfound_view_config(append_slash=True, renderer='404.mako')
+def notfound(request):
+    return {}

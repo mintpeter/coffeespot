@@ -1,3 +1,5 @@
+from pyramid.security import Allow, Everyone
+
 from sqlalchemy import (
     Column,
     Float,
@@ -20,6 +22,12 @@ import time
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
+
+class RootFactory(object):
+    __acl__ = [ (Allow, Everyone, 'view'),
+                (Allow, 0, 'edit')]
+    def __init__(self, request):
+        pass
 
 class Users(Base):
     __tablename__ = 'users'

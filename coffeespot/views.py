@@ -24,7 +24,6 @@ def home(request):
     
     return {'posts': posts, 'username': authenticated_userid(request)}
     
-#    return {'title': 'home'}
 #    try:
 #        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
 #    except DBAPIError:
@@ -100,6 +99,31 @@ def new_post(request):
         return {'message': '',
                 'post': '',
                 'url': request.route_url('new_post')}
+
+@view_config(route_name='edit_post', renderer='edit_post.mako',
+             permission='edit')
+def edit_post(request):
+    if 'submitted' in request.params:
+        post_id = request.params('post_id')
+        post_title = request.params('post_title')
+        post_content = request.params('post_content')
+        post = DBSession.query(Posts).filter(Posts.id == post_id).first()
+        message = ''
+        if post_title != post.title:
+            post.title = post_title
+            message = 'Changes successfully written.'
+        if post_content != post.content:
+            post.content = post_content
+            message = 'Changes successfully written.'
+        if message != '':
+            with transaction.manager:
+                DBSession.add(post)
+        else:
+            message = 'You didn\'t change anything!'
+        return {'message': message}
+    else:
+        post_id = request.matchdict['post_id']
+        return {'post_id', post_id}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):

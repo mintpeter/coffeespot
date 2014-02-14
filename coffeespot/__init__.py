@@ -32,6 +32,7 @@ def main(global_config, **settings):
     config.add_route('logout', '/logout/')
     config.add_route('new_post', '/post/new/')
     config.add_route('edit_post', '/post/edit/{pid}/')
+    config.add_route('delete_post', '/post/delete/{pid}/')
     config.add_route('view_post', '/post/view/{pid}/')
     config.scan()
     return config.make_wsgi_app()

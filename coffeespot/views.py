@@ -127,6 +127,21 @@ def edit_post(request):
         return {'url': request.route_url('edit_post', pid=post_id),
                     'post': post}
 
+@view_config(route_name='delete_post', renderer='delete_post.mako')
+def delete_post(request):
+    post_id = request.matchdict['pid']
+    post = DBSession.query(Posts).filter(Posts.id == post_id).first()
+    if 'submitted' in request.params:
+        with transaction.manager:
+            DBSession.delete(post)
+        return {'url': request.route_url('home'),
+                'post': None,
+                'message': 'Post successfully deleted.'}
+    else:
+        return {'url': request.route_url('delete_post', pid=post_id),
+                'post': post,
+                'message': 'Are you sure you want to delete this post?'}
+
 @view_config(route_name='view_post', renderer='view_post.mako')
 def view_post(request):
     post_id = request.matchdict['pid']

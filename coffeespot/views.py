@@ -20,7 +20,7 @@ import transaction, markdown
 
 from .security import verify_password
 
-@view_config(route_name='home', renderer='home.mak')
+@view_config(route_name='home', renderer='home.mako')
 def home(request):
     posts = DBSession.query(Posts).all()
     for post in posts:
@@ -138,9 +138,16 @@ def delete_post(request):
                 'post': None,
                 'message': 'Post successfully deleted.'}
     else:
-        return {'url': request.route_url('delete_post', pid=post_id),
+        if 'no_delete' in request.params:
+            url = request.route_url('home')
+            post = None
+            message = 'The post was not deleted.'
+        else:
+            url = request.route_url('delete_post', pid=post_id)
+            message = 'Are you sure you want to delete this post?'
+        return {'url': url,
                 'post': post,
-                'message': 'Are you sure you want to delete this post?'}
+                'message': message}
 
 @view_config(route_name='view_post', renderer='view_post.mako')
 def view_post(request):

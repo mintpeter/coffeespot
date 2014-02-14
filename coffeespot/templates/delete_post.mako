@@ -1,6 +1,6 @@
 <%inherit file="base.mako"/>
 
-<%block name="title">Delete Post<%/block>
+<%block name="title">Delete Post</%block>
 
 <span class="message">${message}</span>
 

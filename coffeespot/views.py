@@ -18,7 +18,7 @@ import transaction
 
 from .security import verify_password
 
-@view_config(route_name='home', renderer='home.mako')
+@view_config(route_name='home', renderer='home.mak')
 def home(request):
     posts = DBSession.query(Posts).all()
     
@@ -103,27 +103,35 @@ def new_post(request):
 @view_config(route_name='edit_post', renderer='edit_post.mako',
              permission='edit')
 def edit_post(request):
+    post_id = request.matchdict['pid']
+    post = DBSession.query(Posts).filter(Posts.id == post_id).first()
     if 'submitted' in request.params:
-        post_id = request.params('post_id')
-        post_title = request.params('post_title')
-        post_content = request.params('post_content')
-        post = DBSession.query(Posts).filter(Posts.id == post_id).first()
-        message = ''
+        post_title = request.params.get('title')
+        post_content = request.params.get('post_content')
+        changed = False
         if post_title != post.title:
+            changed = True
             post.title = post_title
-            message = 'Changes successfully written.'
-        if post_content != post.content:
-            post.content = post_content
-            message = 'Changes successfully written.'
-        if message != '':
+        if post_content != post.post:
+            changed = True
+            post.post = post_content
+        if changed:
             with transaction.manager:
                 DBSession.add(post)
-        else:
-            message = 'You didn\'t change anything!'
-        return {'message': message}
+        return HTTPFound(location=request.route_url('view_post', pid=post_id))
     else:
-        post_id = request.matchdict['post_id']
-        return {'post_id', post_id}
+        return {'url': request.route_url('edit_post', pid=post_id),
+                    'post': post}
+
+@view_config(route_name='view_post', renderer='view_post.mako')
+def view_post(request):
+    post_id = request.matchdict['pid']
+    post = DBSession.query(Posts).filter(Posts.id == post_id).first()
+    if post is None:
+        message = 'The post you requested does not exist.'
+    else:
+        message = False
+    return {'message': message, 'post': post}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):

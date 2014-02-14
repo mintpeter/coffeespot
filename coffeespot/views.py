@@ -14,13 +14,17 @@ from .models import (
     Users
     )
 
-import transaction
+from markupsafe import Markup
+
+import transaction, markdown
 
 from .security import verify_password
 
 @view_config(route_name='home', renderer='home.mak')
 def home(request):
     posts = DBSession.query(Posts).all()
+    for post in posts:
+        post.post = Markup(markdown.markdown(post.post))
     
     return {'posts': posts, 'username': authenticated_userid(request)}
     
@@ -130,6 +134,7 @@ def view_post(request):
     if post is None:
         message = 'The post you requested does not exist.'
     else:
+        post.post = Markup(markdown.markdown(post.post))
         message = False
     return {'message': message, 'post': post}
 

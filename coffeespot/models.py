@@ -61,3 +61,5 @@ class Categories(Base):
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True)
     name = Column(UnicodeText)
+    def __init__(self, name):
+        self.name = name

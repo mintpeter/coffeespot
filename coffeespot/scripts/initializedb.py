@@ -15,6 +15,7 @@ from ..models import (
     DBSession,
     Posts,
     Users,
+    Categories,
     Base
     )
 
@@ -39,6 +40,7 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     user = Users('zack', 0, bcrypt.encrypt(u'password'))
-    post = Posts('Title', 1, 'Here is some pointless post content.')
+    post = Posts('Title', 1, 1, 'Here is some pointless post content.')
+    category = Categories('me')
     with transaction.manager:
-        DBSession.add(user, post)
+        DBSession.add_all([user, post, category])

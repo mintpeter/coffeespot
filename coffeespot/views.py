@@ -1,5 +1,4 @@
 #from pyramid.response import Response
-from pyramid.renderers import render_to_response
 from pyramid.view import (view_config,
                           forbidden_view_config,
                           notfound_view_config)

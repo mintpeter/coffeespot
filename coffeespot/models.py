@@ -5,8 +5,8 @@ from sqlalchemy import (
     Float,
     Index,
     Integer,
-    Text,
-    Unicode
+    Unicode,
+    UnicodeText
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -32,9 +32,9 @@ class RootFactory(object):
 class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    name = Column(Unicode(100))
     group = Column(Integer)
-    password = Column(Unicode)
+    password = Column(UnicodeText)
 
     def __init__(self, name, group, password):
         self.name = name
@@ -45,12 +45,19 @@ class Posts(Base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
     date = Column(Float)
-    title = Column(Text)
+    title = Column(UnicodeText)
     authorid = Column(Integer)
-    post = Column(Text)
+    categoryid = Column(Integer)
+    post = Column(UnicodeText)
     
-    def __init__(self, title, authorid, post):
+    def __init__(self, title, authorid, categoryid, post):
         self.title = title
         self.date = time.time()
         self.authorid = authorid
+        self.categoryid = categoryid
         self.post = post
+
+class Categories(Base):
+    __tablename__ = 'categories'
+    id = Column(Integer, primary_key=True)
+    name = Column(UnicodeText)

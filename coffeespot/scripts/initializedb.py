@@ -18,6 +18,8 @@ from ..models import (
     Base
     )
 
+from passlib.hash import bcrypt
+
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -36,5 +38,7 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-#    with transaction.manager:
-#        DBSession.add(user)
+    user = Users('zack', 0, bcrypt.encrypt(u'password'))
+    post = Posts('Title', 1, 'Here is some pointless post content.')
+    with transaction.manager:
+        DBSession.add(user, post)

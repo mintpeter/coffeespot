@@ -21,11 +21,11 @@ from .security import verify_password
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
-    posts = DBSession.query(Posts).all()
-    for post in posts:
-        post.post = Markup(markdown.markdown(post.post))
+    posts = DBSession.query(Posts, Users).filter(Posts.authorid == Users.id).order_by(Posts.id.desc()).all()
     
-    return {'posts': posts, 'username': authenticated_userid(request)}
+    userid = authenticated_userid(request)
+
+    return {'posts': posts, 'username': userid}
     
 #    try:
 #        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
@@ -94,6 +94,7 @@ def new_post(request):
         post_content = request.params.get('post_content')
         new_post = Posts(title=title,
                          authorid=author.first().id,
+                         categoryid=1,
                          post=post_content)
         with transaction.manager:
             DBSession.add(new_post)

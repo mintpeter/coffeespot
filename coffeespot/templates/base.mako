@@ -1,10 +1,32 @@
+<%!
+    from pyramid.security import authenticated_userid
+%>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title><%block name="title"/></title>
-    </head>
-    <body>
-       ${self.body()}
-    </body> 
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet"  type="text/css" href="/css/style.css"/>
+    <title><%block name="title"/></title>
+</head>
+<body>
+    <div id="container">
+        <h1 id="header">Zack Marvel</h1>
+        <div id="navigation">
+            Links
+            <ul>
+                <li><a href="/">Home</a></li>
+% if authenticated_userid(request):
+                <li><a href="/post/new/">New Post</a></li>
+                <li><a href="/logout/">Log Out</a></li>
+% else:
+                <li><a href="/login/">Log In</a></li>
+% endif
+            </ul>
+        </div>
+        <div id="main">
+            ${self.body()}
+        </div>
+    </div>
+</body>
 </html>

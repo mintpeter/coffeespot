@@ -9,11 +9,11 @@
 
 <%block name="title">home</%block>
 
-%for post, user in posts:
+%for post, user, category in posts:
 <div class="post">
     <h3>${post.title}</h2>
     <span class="datetime">
-        posted by ${user.name.capitalize()} on
+        posted by ${user.name.capitalize()} in "${category.name}" on
         ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
         </span>
     ${Markup(markdown.markdown(post.post))}

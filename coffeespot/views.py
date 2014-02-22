@@ -4,13 +4,15 @@ from pyramid.view import (view_config,
                           notfound_view_config)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.security import remember, forget, authenticated_userid
+#from pyramid.events import subscriber, BeforeRender
 
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
     DBSession,
     Posts,
-    Users
+    Users,
+    Categories
     )
 
 from markupsafe import Markup
@@ -19,13 +21,18 @@ import transaction, markdown
 
 from .security import verify_password
 
+#@subscriber(BeforeRender)
+#def add_db_session(event):
+#    event['DBSession'] = DBSession
+
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
-    posts = DBSession.query(Posts, Users).filter(Posts.authorid == Users.id).order_by(Posts.id.desc()).all()
+    posts = DBSession.query(Posts, Users, Categories)
+    posts = posts.filter(Posts.authorid == Users.id)
+    posts = posts.filter(Posts.categoryid == Categories.id)
+    posts = posts.order_by(Posts.id.desc()).all()
     
-    userid = authenticated_userid(request)
-
-    return {'posts': posts, 'username': userid}
+    return {'posts': posts}
     
 #    try:
 #        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
@@ -127,7 +134,8 @@ def edit_post(request):
         return {'url': request.route_url('edit_post', pid=post_id),
                     'post': post}
 
-@view_config(route_name='delete_post', renderer='delete_post.mako')
+@view_config(route_name='delete_post', renderer='delete_post.mako',
+             permission='edit')
 def delete_post(request):
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
@@ -159,6 +167,47 @@ def view_post(request):
         post.post = Markup(markdown.markdown(post.post))
         message = False
     return {'message': message, 'post': post}
+
+@view_config(route_name='new_category', renderer='new_category.mako',
+             permission='edit')
+def new_category(request):
+    if 'submitted' in request.params:
+        category_name = request.params.get('category_name')
+        new_category = Categories(category_name)
+        with transaction.manager:
+            DBSession.add(new_category)
+        return HTTPFound(location=request.route_url('home'))
+    else:
+        {'url': request.route_url('new_category')}
+
+@view_config(route_name='edit_category', renderer='edit_category.mako',
+             permission='edit')
+def edit_category(request):
+    category_id = request.matchdict['cid']
+    category = DBSession.query(Categories).filter(\
+        Categories.id == category_id).first()
+    if 'submitted' in request.params:
+        if 'delete_category' in request.params:
+            with transaction.manager:
+                DBSession.remove(category)
+        else:
+            category.name = request.params.get('category_name')
+            with transaction.manager:
+                DBSession.add(category)
+        return HTTPFound(location=request.route_url('home'))
+    else:
+        return {'url': request.route_url('edit_category', cid=category_id),
+                'category': category}
+
+@view_config(route_name='view_category', renderer='home.mako')
+def view_category(request):
+    category_id = request.matchdict['cid']
+    posts = DBSession.query(Posts, Users, Categories)
+    posts = posts.filter(Posts.categoryid == category_id)
+    posts = posts.filter(Posts.authorid == Users.id)
+    posts = posts.filter(Posts.categoryid == Categories.id)
+    posts = posts.order_by(Posts.id.desc()).all()
+    return {'posts': posts}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):

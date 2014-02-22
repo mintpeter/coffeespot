@@ -1,5 +1,6 @@
 <%!
     from pyramid.security import authenticated_userid
+    from coffeespot.models import DBSession, Categories
 %>
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@
     <div id="container">
         <h1 id="header">Zack Marvel</h1>
         <div id="navigation">
-            Links
+            Pages
             <ul>
                 <li><a href="/">Home</a></li>
 % if authenticated_userid(request):
@@ -22,6 +23,12 @@
 % else:
                 <li><a href="/login/">Log In</a></li>
 % endif
+            </ul>
+            Categories
+            <ul>
+%for category in DBSession.query(Categories).all():
+                <li><a href="${request.route_url('view_category', cid=category.id)}">${category.name.capitalize()}</a></li>
+%endfor
             </ul>
         </div>
         <div id="main">

@@ -20,9 +20,10 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(settings=settings,
                           root_factory='coffeespot.models.RootFactory')
-    config.include('pyramid_chameleon')
     authn_policy = AuthTktAuthenticationPolicy(
-        settings['coffeespot.secret'], callback=group_from_user, hashalg='sha512')
+        settings['coffeespot.secret'],
+        callback=group_from_user,
+        hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
@@ -34,5 +35,8 @@ def main(global_config, **settings):
     config.add_route('edit_post', '/post/edit/{pid}/')
     config.add_route('delete_post', '/post/delete/{pid}/')
     config.add_route('view_post', '/post/view/{pid}/')
+    config.add_route('new_category', '/category/new/')
+    config.add_route('edit_category', '/category/edit/{cid}/')
+    config.add_route('view_category', '/category/view/{cid}/')
     config.scan()
     return config.make_wsgi_app()

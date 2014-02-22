@@ -1,54 +1,95 @@
-body {
-    margin: 0px;
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 13px;
-    //background: #FFFAFA;
+@import url(http://fonts.googleapis.com/css?family=Istok+Web);
+@import url(http://fonts.googleapis.com/css?family=Playfair+Display:400,700);
+html {
+    min-height: 100%;
 }
 
-div#container {
+body {
+    margin: 0px;
+    font-family: 'Istok Web', Verdana, Geneva, sans-serif;
+    font-size: 14px;
+    color: #1C140D;
+    background-color: #1C140D;
+}
+
+div#container{
     width: 850px;
-    margin: auto;
+    margin: 10px auto;
+    background: #FFFFFF;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
 }
 
 h1#header {
-    margin: 0px 0px 30px;
-    padding: 30px 10px;
-    border-bottom: 1px solid #;
-    width: 850px;
-    float: left;
+    margin: 0px;
+    padding: 30px 10px 10px;
+    border-bottom: 10px solid #CBE86B;
+    border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    font-size: 5em;
+    width: 830px;
+    font-family: 'Playfair Display', Verdana, Geneva, sans-serif;
+    background: #CBE86B;
+    text-align: center;
 }
 
 div#navigation {
-    width: 200px;
+    width: 190px;
+    padding: 10px 0px 10px 10px;
     float: left;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 div#navigation ul{
     list-style: none;
     padding: 0px;
     margin-right: 10px;
-    border-top: 1px solid #446679;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 div#navigation ul li{
     padding: 2px;
-    margin; 0px;
-    border-bottom: 1px solid #446679;
+    margin: 2px;
+//    border: 1px solid #F2E9E1;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    background: #CBE86B;
+}
+
+div#navigation ul li a {
+    display: block;
+}
+
+a {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 div#main {
-    width: 650px;
+    padding: 20px;
+    width: 610px;
     float: left;
 }
 
 div.post h3 {
-    border-bottom: 1px solid #446679; 
+    border-bottom: 1px solid #CBE86B;
+    margin-bottom: 2px;
 }
 
 div.post span.datetime {
     display: block;
     text-align: right;
-    font-style: italic;
+}
+
+hr {
+    color: #
+}
+
+.clear {
+    clear: both;
 }

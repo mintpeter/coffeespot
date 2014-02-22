@@ -37,6 +37,7 @@
         <div id="main">
             ${self.body()}
         </div>
+        <div class="clear"></div>
     </div>
 </body>
 </html>

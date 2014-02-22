@@ -27,6 +27,7 @@
         %endif
             <a href="${request.route_url('view_post', pid=post.id)}#disqus_thread">comments</a>
     </div>
+    <hr/>
     %endfor
 %else:
     The posts you have specified do not exist. Click <a href="${request.route_url('home')}"

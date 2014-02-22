@@ -96,12 +96,13 @@ def logout(request):
 def new_post(request):
     if 'submitted' in request.params:
         title = request.params.get('title')
+        category = request.params.get('category')
         users_db = DBSession.query(Users)
         author = users_db.filter(Users.name == authenticated_userid(request))
         post_content = request.params.get('post_content')
         new_post = Posts(title=title,
                          authorid=author.first().id,
-                         categoryid=1,
+                         categoryid=category,
                          post=post_content)
         with transaction.manager:
             DBSession.add(new_post)

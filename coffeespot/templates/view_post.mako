@@ -1,11 +1,15 @@
 <%inherit file="base.mako"/>
 
+<%!
+    from markdown import markdown
+%>
+
 <%block name="title">View Post</%block>
 
 %if post:
 <h3>${post.title}</h3>
 
-${post.post}
+${markdown(post.post) | n}
 
 <div id="disqus_thread"></div>
 <script type="text/javascript">

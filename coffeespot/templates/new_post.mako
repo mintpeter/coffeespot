@@ -1,16 +1,24 @@
 <%inherit file="base.mako"/>
 
-<%block name="title">Edit Post</%block>
+<%block name="title">new post</%block>
 
-% if message == '':
+%if message == '':
 <form action="${url}" method="post">
+    Title:<br/>
     <input type="text" name="title"/><br/>
-    <textarea name="post_content"></textarea>
+    Category:<br/>
+    <select name="category">
+    %for category in categories:
+        <option value="${category.id}">${category.name}</option>
+    %endfor
+    </select><br/>
+    Post:<br/>
+    <textarea name="post_content"></textarea><br/>
     <input type="submit" name="submitted" value="Add Post"/>
 </form>
-% else:
+%else:
 <span class="message">${message}</span><br/>
 ${post}
-% endif
+%endif
 
 

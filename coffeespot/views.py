@@ -4,7 +4,7 @@ from pyramid.view import (view_config,
                           notfound_view_config)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.security import remember, forget, authenticated_userid
-#from pyramid.events import subscriber, BeforeRender
+from pyramid.events import subscriber, BeforeRender
 
 from sqlalchemy.exc import DBAPIError
 
@@ -21,9 +21,9 @@ import transaction, markdown
 
 from .security import verify_password
 
-#@subscriber(BeforeRender)
-#def add_db_session(event):
-#    event['DBSession'] = DBSession
+@subscriber(BeforeRender)
+def add_globals(event):
+    event['userid'] = authenticated_userid(event['request'])
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
@@ -107,8 +107,11 @@ def new_post(request):
             DBSession.add(new_post)
         return {'message': 'Post successfully added.', 'post': post_content}
     else:
+        categories = DBSession.query(Categories).order_by(Categories.name)
+        categories = categories.all()
         return {'message': '',
                 'post': '',
+                'categories': categories,
                 'url': request.route_url('new_post')}
 
 @view_config(route_name='edit_post', renderer='edit_post.mako',
@@ -118,6 +121,7 @@ def edit_post(request):
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
     if 'submitted' in request.params:
         post_title = request.params.get('title')
+        post_category = request.params.get('category')
         post_content = request.params.get('post_content')
         changed = False
         if post_title != post.title:
@@ -126,13 +130,19 @@ def edit_post(request):
         if post_content != post.post:
             changed = True
             post.post = post_content
+        if post_category != post.categoryid:
+            changed = True
+            post.categoryid = post_category
         if changed:
             with transaction.manager:
                 DBSession.add(post)
         return HTTPFound(location=request.route_url('view_post', pid=post_id))
     else:
+        categories = DBSession.query(Categories).order_by(Categories.name)
+        categories = categories.all()
         return {'url': request.route_url('edit_post', pid=post_id),
-                    'post': post}
+                'categories': categories,
+                'post': post}
 
 @view_config(route_name='delete_post', renderer='delete_post.mako',
              permission='edit')
@@ -164,7 +174,6 @@ def view_post(request):
     if post is None:
         message = 'The post you requested does not exist.'
     else:
-        post.post = Markup(markdown.markdown(post.post))
         message = False
     return {'message': message, 'post': post}
 
@@ -178,7 +187,7 @@ def new_category(request):
             DBSession.add(new_category)
         return HTTPFound(location=request.route_url('home'))
     else:
-        {'url': request.route_url('new_category')}
+        return {'url': request.route_url('new_category')}
 
 @view_config(route_name='edit_category', renderer='edit_category.mako',
              permission='edit')

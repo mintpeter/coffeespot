@@ -17,18 +17,21 @@
             Pages
             <ul>
                 <li><a href="/">Home</a></li>
-% if authenticated_userid(request):
+%if userid:
                 <li><a href="/post/new/">New Post</a></li>
                 <li><a href="/logout/">Log Out</a></li>
-% else:
+%else:
                 <li><a href="/login/">Log In</a></li>
-% endif
+%endif
             </ul>
             Categories
             <ul>
 %for category in DBSession.query(Categories).all():
                 <li><a href="${request.route_url('view_category', cid=category.id)}">${category.name.capitalize()}</a></li>
 %endfor
+%if userid:
+                <li><a href="${request.route_url('new_category')}">New Category</a>
+%endif
             </ul>
         </div>
         <div id="main">

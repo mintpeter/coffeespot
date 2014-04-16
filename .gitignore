@@ -1,0 +1,6 @@
+*.pyc
+*.sqlite
+*.cfg
+*.ini
+*.txt
+*.egg-info

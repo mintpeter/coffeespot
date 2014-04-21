@@ -18,6 +18,10 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'markdown',
+    'passlib',
+    'py-bcrypt',
+    'pyyaml',
+    'wtforms',
     ]
 
 setup(name='coffeespot',

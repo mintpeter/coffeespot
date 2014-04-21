@@ -1,4 +1,3 @@
-#from pyramid.response import Response
 from pyramid.view import (view_config,
                           forbidden_view_config,
                           notfound_view_config)

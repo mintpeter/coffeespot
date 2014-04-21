@@ -44,5 +44,6 @@ setup(name='coffeespot',
       main = coffeespot:main
       [console_scripts]
       initialize_coffeespot_db = coffeespot.scripts.initializedb:main
+      coffeespot = coffeespot.scripts.new_post:main
       """,
       )

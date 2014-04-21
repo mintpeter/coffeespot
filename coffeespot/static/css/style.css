@@ -1,7 +1,7 @@
-// http://www.colourlovers.com/palette/3322371/Cardamon_Zing
+/* http://www.colourlovers.com/palette/3322371/Cardamon_Zing */
 
 body {
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Mako', Verdana, Geneva, sans-serif;
     font-size: 13px;
     margin: 0px;
 }
@@ -20,6 +20,7 @@ nav {
     width: 140px;
     float: left;
     padding: 5px;
+    font-size: 11px;
 }
 
 nav span {
@@ -27,12 +28,15 @@ nav span {
     display: block;
     padding: 3px;
     border-radius: 5px;
+    font-size: 12px;
 }
 
 nav ul {
     list-style: none;
     margin: 3px;
-    padding: 0px;
+    padding: 4px 2px;
+    border: 1px #D1CC91 solid;
+    border-radius: 5px;
 }
 
 nav a {
@@ -51,6 +55,34 @@ nav a:hover {
     margin-left: 150px;
 }
 
+a {
+    color: #786E68;
+}
+
+a:hover {
+    color: #D58708;
+}
+
+blockquote {
+    background: #F5F2D8;
+    border-left: 3px solid #D1CC91;
+    padding: 4px;
+}
+
 .clear {
     clear: both;
+}
+
+/* displaying posts */
+
+section.post h3 {
+    background: #94B29D;
+    border-radius: 5px;
+    padding: 3px;
+    margin-bottom: 5px;
+    color: #f8eee7;
+}
+
+span.datetime {
+    font-style: italic;
 }

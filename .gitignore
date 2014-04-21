@@ -4,3 +4,5 @@
 *.ini
 *.txt
 *.egg-info
+*.pid
+*.log

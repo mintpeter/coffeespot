@@ -3,30 +3,29 @@
 <%!
     from markdown import markdown
     import datetime
-    from pyramid.security import authenticated_userid
 %>
 
 <%block name="title">home</%block>
 %if posts:
-    %if 'cid' in request.matchdict:
+    %if 'cid' in request.matchdict and c.userid:
        Click <a href="${request.route_url('edit_category', cid=request.matchdict['cid'])}">
        here</a> to edit this category.
     %endif
 
     %for post, user, category in posts:
-    <div class="post">
+    <section class="post">
         <h3>${post.title}</h2>
         <span class="datetime">
-            posted by ${user.name.capitalize()} in "${category.name}" on
+#            posted by ${user.name.capitalize()} in "<a href="${request.route_url('view_category', cid=category.id)}">${category.name}</a>" on
             ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
             </span>
         ${markdown(post.post) | n}
-        %if userid:
+        %if c.userid:
             <a href="${request.route_url('edit_post', pid=post.id)}">edit post</a>; 
             <a href="${request.route_url('delete_post', pid=post.id)}">delete post</a>;
         %endif
             <a href="${request.route_url('view_post', pid=post.id)}#disqus_thread">comments</a>
-    </div>
+    </section>
     <hr/>
     %endfor
 %else:

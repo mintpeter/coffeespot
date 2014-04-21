@@ -1,3 +1,4 @@
+from pyramid import config as c
 from pyramid.view import (view_config,
                           forbidden_view_config,
                           notfound_view_config)
@@ -6,6 +7,10 @@ from pyramid.security import remember, forget, authenticated_userid
 from pyramid.events import subscriber, BeforeRender
 
 from sqlalchemy.exc import DBAPIError
+import transaction
+
+import markdown
+from wtforms import Form
 
 from .models import (
     DBSession,
@@ -14,15 +19,13 @@ from .models import (
     Categories
     )
 
-from markupsafe import Markup
-
-import transaction, markdown
 
 from .security import verify_password
 
 @subscriber(BeforeRender)
 def add_globals(event):
-    event['userid'] = authenticated_userid(event['request'])
+    c.userid = authenticated_userid(event['request'])
+    event['c'] = c
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):

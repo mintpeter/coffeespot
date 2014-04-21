@@ -4,9 +4,16 @@
 
 %if category:
 <form action="${url}" method="post">
-    <input type="test" name="category_name" value="${category.name}"/><br/>
-    <input type="checkbox" name="delete_category"/><br/>
-    <input type="submit" name="submitted" value="Submit Changes"/>
+    <fieldset>
+        <legend>Category Name</legend>
+        <input type="test" name="category_name" value="${category.name}">
+    </fieldset>
+
+    <fieldset>
+        <legend>Delete Category?</legend>
+        <input type="checkbox" name="delete_category">
+    </fieldset>
+    <input type="submit" name="submitted" value="Submit Changes">
 </form>
 %else:
 The category you specified does not exist. Click

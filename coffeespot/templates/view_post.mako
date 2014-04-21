@@ -7,9 +7,11 @@
 <%block name="title">View Post</%block>
 
 %if post:
-<h3>${post.title}</h3>
+<section class="post">
+    <h3>${post.title}</h3>
 
-${markdown(post.post) | n}
+    ${markdown(post.post) | n}
+</section>
 
 <div id="disqus_thread"></div>
 <script type="text/javascript">

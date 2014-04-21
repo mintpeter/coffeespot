@@ -14,7 +14,4 @@ def group_from_user(username, request):
 def verify_password(username, password):
     user_password = \
         DBSession.query(Users).filter(Users.name == username).first().password
-    if bcrypt.verify(password, user_password):
-        return True
-    else:
-        return False
+    return bcrypt.verify(password, user_password)

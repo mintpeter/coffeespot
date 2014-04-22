@@ -23,6 +23,11 @@
         %endif
         ${form.password()}
     </fieldset>
+
+    <fieldset>
+        <legend>${form.delete.label}</legend>
+        Delete this user? ${form.delete()}
+    </fieldset>
     
     ${form.user_id(value=user.id)}
     ${form.group(value=user.group)}

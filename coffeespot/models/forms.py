@@ -1,11 +1,12 @@
 from wtforms import (
     Form,
-    StringField,
+    BooleanField,
+    HiddenField,
     PasswordField,
     SelectField,
-    HiddenField,
+    StringField,
     SubmitField)
-from wtforms.validators import Length
+from wtforms.validators import Length, optional
 
 groups = [(1, 'editor'), (0, 'admin')]
 
@@ -16,5 +17,7 @@ class UserForm(Form):
     submit = SubmitField('Login')
 
 class EditUserForm(UserForm):
+    delete = BooleanField('Delete')
+    password = PasswordField('Password', [optional(), Length(min=6)])
     user_id = HiddenField()
     group = HiddenField()

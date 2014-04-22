@@ -217,8 +217,7 @@ def new_user(request):
     if request.POST and form.validate():
         password = bcrypt.encrypt(form.password.data)
         user = Users(form.name.data, form.group.data, password)
-        with transaction.manager:
-            DBSession.add(user)
+        DBSession.add(user)
         return HTTPFound(location=request.route_url('home'))
     return {'form': form}
 
@@ -236,11 +235,15 @@ def edit_user(request):
         raise HTTPUnauthorized()
     form = EditUserForm(request.POST)
     if request.POST and form.validate():
-        password = bcrypt.encrypt(form.password.data)
-        user.name = form.name.data
-        user.password = password
-        DBSession.add(user)
-        return HTTPFound(location=request.route_url('view_user', uid=user.id))
+        if not form.delete.data:
+            password = bcrypt.encrypt(form.password.data)
+            user.name = form.name.data
+            user.password = password
+            DBSession.add(user)
+            return HTTPFound(location=request.route_url('view_user', uid=user.id))
+        else:
+            DBSession.delete(user)
+            return HTTPFound(location=request.route_url('home'))
     return {'form': form, 'user': user}
 
 @view_config(route_name='view_user', renderer='view_user.mako')

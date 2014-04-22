@@ -29,7 +29,7 @@
     <hr/>
     %endfor
 %else:
-    The posts you have specified do not exist. Click <a href="${request.route_url('home')}"
+    The posts you have specified do not exist. Click <a href="${request.route_url('home')}">
     here</a> to go home.
 %endif
 

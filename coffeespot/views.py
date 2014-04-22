@@ -2,11 +2,17 @@ from pyramid import config as c
 from pyramid.view import (view_config,
                           forbidden_view_config,
                           notfound_view_config)
-from pyramid.httpexceptions import HTTPFound, exception_response
+from pyramid.httpexceptions import (
+    HTTPFound,
+    HTTPForbidden,
+    HTTPNotFound,
+    HTTPUnauthorized
+    )
 from pyramid.security import remember, forget, authenticated_userid
 from pyramid.events import subscriber, BeforeRender
 
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 import markdown
@@ -219,8 +225,15 @@ def new_user(request):
 @view_config(route_name='edit_user', renderer='edit_user.mako',
     permission='edit')
 def edit_user(request):
+    active_user = DBSession.query(Users)\
+                    .filter(Users.name == authenticated_userid(request)).one()
     user_id = request.matchdict['uid']
-    user = DBSession.query(Users).filter(Users.id == user_id).first()
+    try:
+        user = DBSession.query(Users).filter(Users.id == user_id).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if active_user.group != 0 and active_user is not user:
+        raise HTTPUnauthorized()
     form = EditUserForm(request.POST)
     if request.POST and form.validate():
         password = bcrypt.encrypt(form.password.data)
@@ -241,9 +254,13 @@ def view_user(request):
                 .filter(Posts.authorid == user_id)\
                 .all()
     except:
-        raise exception_response(404)
+        raise HTTPNotFound()
         
     return {'user': user, 'posts': posts}
+
+@view_config(context=HTTPUnauthorized, renderer='401.mako')
+def unauthorized(request):
+    return {}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):

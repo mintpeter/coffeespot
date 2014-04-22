@@ -16,7 +16,15 @@
     <section class="post">
         <h3>${post.title}</h2>
         <span class="datetime">
-#            posted by ${user.name.capitalize()} in "<a href="${request.route_url('view_category', cid=category.id)}">${category.name}</a>" on
+            posted by
+            <a href="${request.route_url('view_user', uid=user.id)}">
+                ${user.name}
+            </a>
+            in "
+            <a href="${request.route_url('view_category', cid=category.id)}">
+                ${category.name}
+            </a>
+            " on
             ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
             </span>
         ${markdown(post.post) | n}

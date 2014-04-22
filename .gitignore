@@ -3,6 +3,8 @@
 *.cfg
 *.ini
 *.txt
+*.egg
 *.egg-info
 *.pid
 *.log
+*.swp

@@ -2,7 +2,7 @@ from pyramid import config as c
 from pyramid.view import (view_config,
                           forbidden_view_config,
                           notfound_view_config)
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.httpexceptions import HTTPFound, exception_response
 from pyramid.security import remember, forget, authenticated_userid
 from pyramid.events import subscriber, BeforeRender
 
@@ -12,19 +12,27 @@ import transaction
 import markdown
 from wtforms import Form
 
-from .models import (
+from passlib.hash import bcrypt
+
+from models.tables import (
     DBSession,
     Posts,
     Users,
     Categories
     )
 
+from models.forms import UserForm, EditUserForm
 
 from .security import verify_password
 
 @subscriber(BeforeRender)
 def add_globals(event):
-    c.userid = authenticated_userid(event['request'])
+    username = authenticated_userid(event['request'])
+    if username:
+        c.user = DBSession.query(Users)\
+                    .filter(Users.name == username).first()
+    else:
+        c.user = None
     event['c'] = c
 
 @view_config(route_name='home', renderer='home.mako')
@@ -35,30 +43,6 @@ def home(request):
     posts = posts.order_by(Posts.id.desc()).all()
     
     return {'posts': posts}
-    
-#    try:
-#        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
-#    except DBAPIError:
-#        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-#    return {'one': one, 'project': 'coffeespot'}
-
-
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
-
-1.  You may need to run the "initialize_coffeespot_db" script
-    to initialize your database tables.  Check your virtual 
-    environment's "bin" directory for this script and try to run it.
-
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
-
 
 @view_config(route_name='login', renderer='login.mako')
 @forbidden_view_config(renderer='login.mako')
@@ -181,7 +165,7 @@ def view_post(request):
     return {'message': message, 'post': post}
 
 @view_config(route_name='new_category', renderer='new_category.mako',
-             permission='edit')
+             permission='admin')
 def new_category(request):
     if 'submitted' in request.params:
         category_name = request.params.get('category_name')
@@ -193,7 +177,7 @@ def new_category(request):
         return {'url': request.route_url('new_category')}
 
 @view_config(route_name='edit_category', renderer='edit_category.mako',
-             permission='edit')
+             permission='admin')
 def edit_category(request):
     category_id = request.matchdict['cid']
     category = DBSession.query(Categories).filter(\
@@ -220,6 +204,46 @@ def view_category(request):
     posts = posts.filter(Posts.categoryid == Categories.id)
     posts = posts.order_by(Posts.id.desc()).all()
     return {'posts': posts}
+
+@view_config(route_name='new_user', renderer='new_user.mako', permission='admin')
+def new_user(request):
+    form = UserForm(request.POST)
+    if request.POST and form.validate():
+        password = bcrypt.encrypt(form.password.data)
+        user = Users(form.name.data, form.group.data, password)
+        with transaction.manager:
+            DBSession.add(user)
+        return HTTPFound(location=request.route_url('home'))
+    return {'form': form}
+
+@view_config(route_name='edit_user', renderer='edit_user.mako',
+    permission='edit')
+def edit_user(request):
+    user_id = request.matchdict['uid']
+    user = DBSession.query(Users).filter(Users.id == user_id).first()
+    form = EditUserForm(request.POST)
+    if request.POST and form.validate():
+        password = bcrypt.encrypt(form.password.data)
+        user.name = form.name.data
+        user.password = password
+        DBSession.add(user)
+        return HTTPFound(location=request.route_url('view_user', uid=user.id))
+    return {'form': form, 'user': user}
+
+@view_config(route_name='view_user', renderer='view_user.mako')
+def view_user(request):
+    user_id = request.matchdict['uid']
+    try:
+        user = DBSession.query(Users)\
+                .filter(Users.id == user_id)\
+                .one()
+        posts = DBSession.query(Posts)\
+                .filter(Posts.authorid == user_id)\
+                .all()
+    except:
+        raise exception_response(404)
+        
+    return {'user': user, 'posts': posts}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):

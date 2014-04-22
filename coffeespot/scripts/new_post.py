@@ -10,7 +10,7 @@ from sqlalchemy import engine_from_config
 
 from pyramid.paster import get_appsettings
 
-from ..models import DBSession, Posts, Categories, Base
+from coffeespot.models.tables import DBSession, Posts, Categories, Base
 
 def usage(argv):
     cmd = os.path.basename(argv[0])

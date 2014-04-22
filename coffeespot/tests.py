@@ -3,7 +3,7 @@ import transaction
 
 from pyramid import testing
 
-from .models import DBSession
+from coffeespot.models.tables import DBSession
 
 
 class TestMyViewSuccessCondition(unittest.TestCase):

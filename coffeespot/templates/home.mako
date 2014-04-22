@@ -7,7 +7,7 @@
 
 <%block name="title">home</%block>
 %if posts:
-    %if 'cid' in request.matchdict and c.userid:
+    %if 'cid' in request.matchdict and c.user:
        Click <a href="${request.route_url('edit_category', cid=request.matchdict['cid'])}">
        here</a> to edit this category.
     %endif
@@ -20,7 +20,7 @@
             ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
             </span>
         ${markdown(post.post) | n}
-        %if c.userid:
+        %if c.user:
             <a href="${request.route_url('edit_post', pid=post.id)}">edit post</a>; 
             <a href="${request.route_url('delete_post', pid=post.id)}">delete post</a>;
         %endif

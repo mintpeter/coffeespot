@@ -6,7 +6,7 @@ from .security import group_from_user
 
 from sqlalchemy import engine_from_config
 
-from .models import (
+from models.tables import (
     DBSession,
     Base,
     )
@@ -39,5 +39,8 @@ def main(global_config, **settings):
     config.add_route('new_category', '/category/new/')
     config.add_route('edit_category', '/category/edit/{cid}/')
     config.add_route('view_category', '/category/view/{cid}/')
+    config.add_route('new_user', '/user/new/')
+    config.add_route('edit_user', '/user/edit/{uid}/')
+    config.add_route('view_user', '/user/view/{uid}/')
     config.scan()
     return config.make_wsgi_app()

@@ -23,6 +23,11 @@ nav {
     font-size: 11px;
 }
 
+footer {
+    background: #F5F2D8;
+    padding: 5px 10px;
+}
+
 nav span {
     background: #D1CC91;
     display: block;

@@ -33,6 +33,10 @@ from .security import verify_password
 
 @subscriber(BeforeRender)
 def add_globals(event):
+    """Store the username in the application registry. This should probably use
+    a session instead.
+    """
+
     username = authenticated_userid(event['request'])
     if username:
         c.user = DBSession.query(Users)\
@@ -41,18 +45,29 @@ def add_globals(event):
         c.user = None
     event['c'] = c
 
+
+# This could be a generalized page-viewer. This would probably entail moving
+# some Python to the template, which is kind of icky. I'll have to play with
+# this.
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
-    posts = DBSession.query(Posts, Users, Categories)
-    posts = posts.filter(Posts.authorid == Users.id)
-    posts = posts.filter(Posts.categoryid == Categories.id)
+    """Get the posts for /home."""
+
+    posts = DBSession.query(Posts, Users, Categories)\
+                .join(Users, Posts.authorid==Users.id)\
+                .join(Categories, Posts.categoryid==Categories.id)
     posts = posts.order_by(Posts.id.desc()).all()
     
     return {'posts': posts}
 
+### TODO: Move to wtforms.
 @view_config(route_name='login', renderer='login.mako')
 @forbidden_view_config(renderer='login.mako')
 def login(request):
+    """If the user came from this page and has submitted the form, try to log
+    them in. Otherwise, give them the login page.
+    """
+
     login_url = request.route_url('login')
     referrer = request.url
     if login_url == referrer:
@@ -80,12 +95,20 @@ def login(request):
 
 @view_config(route_name='logout')
 def logout(request):
+    """View for /logout, which ends the user's session."""
+
     headers = forget(request)
     return HTTPFound(location=request.route_url('home'), headers=headers)
 
+### TODO: Move to wtforms.
 @view_config(route_name='new_post', renderer='new_post.mako',
              permission='edit')
 def new_post(request):
+    """View for /post/new. If the post has already been submitted, try to add it
+    to the database and display a success message. Otherwise, show the new post
+    form.
+    """
+
     if 'submitted' in request.params:
         title = request.params.get('title')
         category = request.params.get('category')
@@ -107,9 +130,14 @@ def new_post(request):
                 'categories': categories,
                 'url': request.route_url('new_post')}
 
+### TODO: Move to wtforms.
 @view_config(route_name='edit_post', renderer='edit_post.mako',
              permission='edit')
 def edit_post(request):
+    """View for /post/edit. If the form's already been submitted, change it in
+    the database. Otherwise, show the edit post form.
+    """
+
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
     if 'submitted' in request.params:
@@ -137,9 +165,14 @@ def edit_post(request):
                 'categories': categories,
                 'post': post}
 
+### wtforms probably wouldn't hurt here either.
 @view_config(route_name='delete_post', renderer='delete_post.mako',
              permission='edit')
 def delete_post(request):
+    """View for /post/delete. If the user has already confirmed that they want
+    to delete the post, delete it. Otherwise, ask them if they're sure.
+    """
+
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
     if 'submitted' in request.params:
@@ -162,17 +195,22 @@ def delete_post(request):
 
 @view_config(route_name='view_post', renderer='view_post.mako')
 def view_post(request):
+    """View for /post/view. Display a single post, with its comments thread."""
+
     post_id = request.matchdict['pid']
-    post = DBSession.query(Posts).filter(Posts.id == post_id).first()
+    post = DBSession.query(Posts).filter(Posts.id == post_id).one()
     if post is None:
         message = 'The post you requested does not exist.'
     else:
         message = False
     return {'message': message, 'post': post}
 
+### TODO: move to wtforms.
 @view_config(route_name='new_category', renderer='new_category.mako',
              permission='admin')
 def new_category(request):
+    """View for /category/new. Adds a category."""
+
     if 'submitted' in request.params:
         category_name = request.params.get('category_name')
         new_category = Categories(category_name)
@@ -181,10 +219,12 @@ def new_category(request):
         return HTTPFound(location=request.route_url('home'))
     else:
         return {'url': request.route_url('new_category')}
-
+### TODO: move to wtforms.
 @view_config(route_name='edit_category', renderer='edit_category.mako',
              permission='admin')
 def edit_category(request):
+    """View for /category/edit. Edit or delete a category."""
+
     category_id = request.matchdict['cid']
     category = DBSession.query(Categories).filter(\
         Categories.id == category_id).first()
@@ -201,8 +241,14 @@ def edit_category(request):
         return {'url': request.route_url('edit_category', cid=category_id),
                 'category': category}
 
+# When there are no posts in the category, this page just tells you so. I think
+# it would be sensible to offer to delete the category. This would suggest some
+# kind of utility function, because it would duplicate some functionality in
+# edit_category.
 @view_config(route_name='view_category', renderer='home.mako')
 def view_category(request):
+    """View for /category/view. Display the posts in a single category."""
+
     category_id = request.matchdict['cid']
     posts = DBSession.query(Posts, Users, Categories)
     posts = posts.filter(Posts.categoryid == category_id)
@@ -213,6 +259,8 @@ def view_category(request):
 
 @view_config(route_name='new_user', renderer='new_user.mako', permission='admin')
 def new_user(request):
+    """View for /user/new. Add a new user!"""
+
     form = UserForm(request.POST)
     if request.POST and form.validate():
         password = bcrypt.encrypt(form.password.data)
@@ -224,6 +272,8 @@ def new_user(request):
 @view_config(route_name='edit_user', renderer='edit_user.mako',
     permission='edit')
 def edit_user(request):
+    """View for /user/edit. Edit a user's attributes."""
+
     active_user = DBSession.query(Users)\
                     .filter(Users.name == authenticated_userid(request)).one()
     user_id = request.matchdict['uid']
@@ -246,8 +296,11 @@ def edit_user(request):
             return HTTPFound(location=request.route_url('home'))
     return {'form': form, 'user': user}
 
+# Since this is a blog, this should probably list their posts.
 @view_config(route_name='view_user', renderer='view_user.mako')
 def view_user(request):
+    """View for /user/view. Look at a user's profile."""
+
     user_id = request.matchdict['uid']
     try:
         user = DBSession.query(Users)\
@@ -263,8 +316,15 @@ def view_user(request):
 
 @view_config(context=HTTPUnauthorized, renderer='401.mako')
 def unauthorized(request):
+    """View for a 401 error. This is mostly for unauthenticated users, but it
+    also gets called when somebody doesn't have rights to do something. See
+    edit_user. That may not be the best way to do it, though.
+    """
+
     return {}
 
 @notfound_view_config(append_slash=True, renderer='404.mako')
 def notfound(request):
+    """View for a 404 error."""
+
     return {}

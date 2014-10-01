@@ -21,7 +21,7 @@ import time
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
-
+### TODO: group should be called group_id. id should be a foreign key.
 class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -34,6 +34,7 @@ class Users(Base):
         self.group = group
         self.password = password
 
+### TODO: authorid is a foreign key. categoryid is a foreign key.
 class Posts(Base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
@@ -50,6 +51,7 @@ class Posts(Base):
         self.categoryid = categoryid
         self.post = post
 
+### TODO: id is a foreign key.
 class Categories(Base):
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True)

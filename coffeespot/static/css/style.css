@@ -1,71 +1,97 @@
 /* http://www.colourlovers.com/palette/3322371/Cardamon_Zing */
 
 body {
-    font-family: 'Mako', Verdana, Geneva, sans-serif;
-    font-size: 13px;
+    font-family: 'Merriweather', Verdana, Geneva, sans-serif;
+    font-size: .9em;
     margin: 0px;
+    background: #EDF6EE;
+    color: #000000;
+    line-height: 1.5em;
 }
 
 header {
-    border-bottom: 10px solid #786E68;
+    background: #151101;
+    border-bottom: 5px solid #B3204D;
+    padding: 10px 0px;
+    margin-bottom: 10px;
 }
 
 header h1 {
-    background: #F5F2D8;
+    color: #ffffff;
+    font-size: 3em;
     padding: 20px;
     margin: 0px;
+    text-shadow: 1px 1px 1px #000000;
+    text-align: center;
 }
 
 nav {
-    width: 140px;
-    float: left;
-    padding: 5px;
-    font-size: 11px;
+    width: 100%;
+    font-size: .8em;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px dotted #D1C089;
 }
 
 footer {
-    background: #F5F2D8;
     padding: 5px 10px;
 }
 
 nav span {
-    background: #D1CC91;
-    display: block;
+    margin-top: 5px;
+    text-align: center;
     padding: 3px;
-    border-radius: 5px;
-    font-size: 12px;
 }
 
 nav ul {
     list-style: none;
-    margin: 3px;
-    padding: 4px 2px;
-    border: 1px #D1CC91 solid;
-    border-radius: 5px;
+    margin: 0px;
+    padding-left: 0px;
+    margin-right: 10px;
+    display: inline;
+}
+
+nav ul li {
+    display: inline;
 }
 
 nav a {
-    color: #000000;
-    text-decoration: none;
-    display: block;
-    padding-bottom: 2px;
-    border-bottom: 1px solid #94B29D;
 }
 
 nav a:hover {
-    border-bottom: 1px dotted #D58708;
 }
 
 #main {
-    margin-left: 150px;
+    margin: auto;
+    width: 80%;
+    min-width: 400px;
+    padding: 10px;
+}
+
+#main h2.title {
+    margin: 0px;
+    padding: 5px;
+    background: #412E28;
+    color: #ffffff;
+    text-shadow: 1px 1px 1px #EDCFDD;
+    text-align: center;
+}
+
+footer {
+    border-top: 1px solid #D1C089;
+    text-align: center;
+    font-size: .8em;
 }
 
 a {
-    color: #786E68;
+    color: #412E28;
+    text-decoration: none;
+    border-bottom: 1px solid #412E28;
 }
 
 a:hover {
-    color: #D58708;
+    color: #B3204D;
+    border-bottom: 1px dotted #B3204D;
 }
 
 blockquote {
@@ -80,12 +106,14 @@ blockquote {
 
 /* displaying posts */
 
+section.post {
+//    background: #412E28;
+}
+
 section.post h3 {
-    background: #94B29D;
-    border-radius: 5px;
+    border-bottom: 1px solid #D1C089;
     padding: 3px;
     margin-bottom: 5px;
-    color: #f8eee7;
 }
 
 span.datetime {

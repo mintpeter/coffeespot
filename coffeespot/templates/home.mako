@@ -16,16 +16,9 @@
     <section class="post">
         <h3>${post.title}</h3>
         <span class="datetime">
-            posted by
-            <a href="${request.route_url('view_user', uid=user.id)}">
-                ${user.name}
-            </a>
-            in "
-            <a href="${request.route_url('view_category', cid=category.id)}">
-                ${category.name}
-            </a>
-            " on
-            ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
+            posted by <a href="${request.route_url('view_user', uid=user.id)}">${user.name}</a>
+            in category <a href="${request.route_url('view_category', cid=category.id)}">${category.name}</a>
+            on ${datetime.datetime.fromtimestamp(post.date).strftime("%d %B %Y %I:%M %p")}
             </span>
         ${markdown(post.post) | n}
         %if c.user:
@@ -34,7 +27,6 @@
         %endif
             <a href="${request.route_url('view_post', pid=post.id)}#disqus_thread">comments</a>
     </section>
-    <hr/>
     %endfor
 %else:
     The posts you have specified do not exist. Click <a href="${request.route_url('home')}">

@@ -9,16 +9,16 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="/css/style.css"/>
-    <link href='http://fonts.googleapis.com/css?family=Mako' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
     <title>${self.title()}</title>
 </head>
 <body>
     <header>
-        <h1 id="header">Zack Marvel</h1>
+        <a href="${request.route_url('home')}" title="home"><h1 id="header">Zack Marvel</h1></a>
     </header>
     
     <nav>
-    <span>Pages</span>
+    <span>Pages:</span>
         <ul class="navigation">
             <li><a href="${request.route_url('home')}">Home</a></li>
 %if c.user:
@@ -28,12 +28,12 @@
             <li><a href="${request.route_url('login')}">Log In</a></li>
 %endif
         </ul>
-    <span>Categories</span>
+    <span>Categories:</span>
         <ul class="navigation">
 %for category in DBSession.query(Categories).all():
-            <li><a href="${request.route_url('view_category', cid=category.id)}">
-                ${category.name.capitalize()}
-            </a></li>
+            <li>
+                <a href="${request.route_url('view_category', cid=category.id)}">${category.name.capitalize()}</a>
+            </li>
 %endfor
 %if c.user:
             <li><a href="${request.route_url('new_category')}">New Category</a>
@@ -51,6 +51,7 @@
 %endif
     </nav>
     <div id="main">
+        <h2 class="title">${self.title()}</h2>
         ${self.body()}
         <div class="clear">&nbsp;</div>
     </div>

@@ -27,7 +27,7 @@ from models.tables import (
     Categories
     )
 
-from models.forms import LoginForm, UserForm, EditUserForm
+from models.forms import LoginForm, UserForm, EditUserForm, PostForm
 
 from .security import verify_password
 
@@ -60,7 +60,6 @@ def home(request):
     
     return {'posts': posts}
 
-### TODO: Move to wtforms.
 @view_config(route_name='login', renderer='login.mako')
 @forbidden_view_config(renderer='login.mako')
 def login(request):
@@ -108,7 +107,6 @@ def logout(request):
     headers = forget(request)
     return HTTPFound(location=request.route_url('home'), headers=headers)
 
-### TODO: Move to wtforms.
 @view_config(route_name='new_post', renderer='new_post.mako',
              permission='edit')
 def new_post(request):
@@ -117,26 +115,26 @@ def new_post(request):
     form.
     """
 
-    if 'submitted' in request.params:
-        title = request.params.get('title')
-        category = request.params.get('category')
+    form = PostForm(request.POST)
+    post_content = None
+    if request.POST and form.validate():
+        title = form.title.data
+        category = form.category.data
+        post_content = form.post_content.data
+        
         users_db = DBSession.query(Users)
         author = users_db.filter(Users.name == authenticated_userid(request))
-        post_content = request.params.get('post_content')
+        
         new_post = Posts(title=title,
                          authorid=author.first().id,
                          categoryid=category,
                          post=post_content)
+        
         with transaction.manager:
             DBSession.add(new_post)
-        return {'message': 'Post successfully added.', 'post': post_content}
-    else:
-        categories = DBSession.query(Categories).order_by(Categories.name)
-        categories = categories.all()
-        return {'message': '',
-                'post': '',
-                'categories': categories,
-                'url': request.route_url('new_post')}
+        
+    return {'form': form, 
+            'post': post_content} #this should be run through markdown renderer
 
 ### TODO: Move to wtforms.
 @view_config(route_name='edit_post', renderer='edit_post.mako',

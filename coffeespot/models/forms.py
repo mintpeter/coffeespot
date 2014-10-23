@@ -5,8 +5,11 @@ from wtforms import (
     PasswordField,
     SelectField,
     StringField,
-    SubmitField)
+    SubmitField,
+    TextAreaField)
 from wtforms.validators import Length, optional
+
+from .tables import DBSession, Categories
 
 groups = [(1, 'editor'), (0, 'admin')]
 
@@ -27,3 +30,13 @@ class LoginForm(Form):
     username = StringField('Username')
     password = PasswordField('Password')
     submit = SubmitField('Login')
+
+
+categories = DBSession.query(Categories).order_by(Categories.name)
+categories = [(c.id, c.name) for c in categories.all()]
+
+class PostForm(Form):
+    title = StringField('Title', [Length(min=1)])
+    category = SelectField('Category', coerce=int, choices=categories)
+    post_content = TextAreaField('Post', [Length(min=1)])
+    submit = SubmitField('Submit Post')

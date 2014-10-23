@@ -4,9 +4,28 @@
 
 <span class="message">${message}</span>
 
-<form action="${url}" method="post">
-    <input type="hidden" name="came_from" value="${came_from}"/>
-    <input type="text" name="username" value="${username}"/><br/>
-    <input type="password" name="password"/><br/>
-    <input type="submit" name="submitted" value="Log In"/>
+<form method="POST" action="${request.route_url('login')}">
+    <fieldset>
+        <legend>${form.username.label}</legend>
+        %if form.username.errors:
+            %for error in form.username.errors:
+        <span class="error">${error}</span>
+            %endfor
+        %endif
+        ${form.username()}
+    </fieldset>
+
+    <fieldset>
+        <legend>${form.password.label}</legend>
+        %if form.password.errors:
+            %for error in form.password.errors:
+        <span class="error">${error}</span>
+            %endfor
+        %endif
+        ${form.password()}
+    </fieldset>
+
+    ${form.came_from(value=came_from)}
+
+    ${form.submit()}
 </form>

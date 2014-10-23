@@ -27,7 +27,7 @@ from models.tables import (
     Categories
     )
 
-from models.forms import UserForm, EditUserForm
+from models.forms import LoginForm, UserForm, EditUserForm
 
 from .security import verify_password
 
@@ -72,10 +72,16 @@ def login(request):
     referrer = request.url
     if login_url == referrer:
         referrer = '/'
-    came_from = request.params.get('came_from', referrer)
-    if 'submitted' in request.params:
-        username = request.params.get('username')
-        password = request.params.get('password')
+
+    form = LoginForm(request.POST)
+    if form.came_from.data:
+        came_from = form.came_from.data
+    else:
+        came_from = referrer
+
+    if request.POST and form.validate():
+        username = form.username.data
+        password = form.password.data
         if verify_password(username, password):
             headers = remember(request, username)
             return HTTPFound(location=came_from, headers=headers)
@@ -83,12 +89,14 @@ def login(request):
             message = 'Incorrect login information.'
             return {'message': message,
                     'username': username,
+                    'form': form,
                     'came_from': came_from,
                     'url': request.route_url('login')
                     }
     else:
         return {'message': '',
                 'username': '',
+                'form': form,
                 'came_from': came_from,
                 'url': request.route_url('login')
                 }

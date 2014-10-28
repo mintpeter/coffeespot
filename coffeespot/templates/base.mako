@@ -58,7 +58,7 @@
     <footer>
         Powered by <a href="http://python.org">Python</a> and
         <a href="http://pylonsproject.org">Pyramid</a>. Would you like to view
-        <a href="https://github.com/mintpeter/coffeespot">the source</a>?
+        <a href="https://github.com/zmarvel/coffeespot">the source</a>?
     </footer>
 </body>
 </html>

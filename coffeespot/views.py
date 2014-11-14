@@ -146,29 +146,20 @@ def edit_post(request):
 
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
-    if 'submitted' in request.params:
-        post_title = request.params.get('title')
-        post_category = request.params.get('category')
-        post_content = request.params.get('post_content')
-        changed = False
-        if post_title != post.title:
-            changed = True
-            post.title = post_title
-        if post_content != post.post:
-            changed = True
-            post.post = post_content
-        if post_category != post.categoryid:
-            changed = True
-            post.categoryid = post_category
-        if changed:
-            with transaction.manager:
-                DBSession.add(post)
+    form = PostForm(request.POST)
+    if request.POST and form.validate():
+        title = form.title.data
+        category = form.category.data
+        post_content = form.post_content.data
+
+        post.title = title
+        post.post = post_content
+        post.categoryid = category
+        with transaction.manager:
+            DBSession.add(post)
         return HTTPFound(location=request.route_url('view_post', pid=post_id))
     else:
-        categories = DBSession.query(Categories).order_by(Categories.name)
-        categories = categories.all()
-        return {'url': request.route_url('edit_post', pid=post_id),
-                'categories': categories,
+        return {'form': form,
                 'post': post}
 
 ### wtforms probably wouldn't hurt here either.

@@ -3,33 +3,42 @@
 <%block name="title">Edit Post</%block>
 
 % if post:
-<form action="${url}" method="post">
+<form action="${request.route_url('edit_post')}" method="post">
     <fieldset>
-        <legend>Post Title</legend>
-        <input type="text" name="title" value="${post.title}">
+        <legend>${form.title.label}</legend>
+        %if form.title.errors:
+            %for error in form.title.errors:
+            ${error}
+            %endfor
+        %endif
+        ${form.title()}
     </fieldset>
 
     <fieldset>
-        <legend>Category</legend>
-        <select name="category">
-%for category in categories:
-    %if category.id == post.categoryid:
-            <option value="${category.id}" selected>${category.name}</option>
-    %else:
-            <option value="${category.id}">${category.name}</option>
-    %endif
-%endfor
-        </select>
+        <legend>${form.category.label}</legend>
+        %if form.category.errors:
+            %for error in form.category.errors:
+            ${error}
+            %endfor
+        %endif
+        ${form.category()}
     </fieldset>
 
     <fieldset>
-        <legend>Post</legend>
-        <textarea name="post_content">${post.post}</textarea>
+        <legend>${form.post_content.label}</legend>
+        %if form.post_content.errors:
+            %for error in form.post_content.errors:
+            ${error}
+            %endfor
+        %endif
+        ${form.post_content()}
     </fieldset>
-    <input type="submit" name="submitted" value="Submit Changes">
+
+    ${form.submit()}
 </form>
 
 % else:
-<span class="message">${message}</span>
+<span class="message">The post you requested wasn't found. If a link on this
+website led you here, please file a bug report.</span>
 
 %endif

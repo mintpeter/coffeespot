@@ -27,7 +27,13 @@ from models.tables import (
     Categories
     )
 
-from models.forms import LoginForm, UserForm, EditUserForm, PostForm
+from models.forms import (
+    LoginForm, 
+    UserForm, 
+    EditUserForm, 
+    PostForm,
+    CategoryForm
+    )
 
 from .security import verify_password
 
@@ -203,20 +209,21 @@ def view_post(request):
         message = False
     return {'message': message, 'post': post}
 
-### TODO: move to wtforms.
 @view_config(route_name='new_category', renderer='new_category.mako',
              permission='admin')
 def new_category(request):
     """View for /category/new. Adds a category."""
 
-    if 'submitted' in request.params:
-        category_name = request.params.get('category_name')
-        new_category = Categories(category_name)
+    form = CategoryForm(request.POST)
+    if request.POST and form.validate():
+        name = form.name.data
+        new_category = Categories(name)
         with transaction.manager:
             DBSession.add(new_category)
         return HTTPFound(location=request.route_url('home'))
     else:
-        return {'url': request.route_url('new_category')}
+        return {'form': form}
+
 ### TODO: move to wtforms.
 @view_config(route_name='edit_category', renderer='edit_category.mako',
              permission='admin')

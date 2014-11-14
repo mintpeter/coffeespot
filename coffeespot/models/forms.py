@@ -40,3 +40,7 @@ class PostForm(Form):
     category = SelectField('Category', coerce=int, choices=categories)
     post_content = TextAreaField('Post', [Length(min=1)])
     submit = SubmitField('Submit Post')
+
+class CategoryForm(Form):
+    name = StringField('Name', [Length(min=1)])
+    submit = SubmitField('Submit Post')

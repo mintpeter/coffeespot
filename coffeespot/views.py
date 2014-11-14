@@ -233,17 +233,18 @@ def edit_category(request):
     category_id = request.matchdict['cid']
     category = DBSession.query(Categories).filter(\
         Categories.id == category_id).first()
-    if 'submitted' in request.params:
-        if 'delete_category' in request.params:
+    form = EditCategoryForm(request.POST)
+    if request.POST and form.validate():
+        if form.delete.data:
             with transaction.manager:
                 DBSession.remove(category)
         else:
-            category.name = request.params.get('category_name')
+            category.name = form.name.data
             with transaction.manager:
                 DBSession.add(category)
         return HTTPFound(location=request.route_url('home'))
     else:
-        return {'url': request.route_url('edit_category', cid=category_id),
+        return {'form': form,
                 'category': category}
 
 # When there are no posts in the category, this page just tells you so. I think

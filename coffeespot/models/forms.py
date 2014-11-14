@@ -44,3 +44,6 @@ class PostForm(Form):
 class CategoryForm(Form):
     name = StringField('Name', [Length(min=1)])
     submit = SubmitField('Submit Post')
+
+class EditCategoryForm(CategoryForm):
+    delete = BooleanField('Delete Category')

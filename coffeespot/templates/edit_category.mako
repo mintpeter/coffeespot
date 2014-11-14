@@ -3,17 +3,27 @@
 <%block name="title">edit category</%block>
 
 %if category:
-<form action="${url}" method="post">
+<form action="${request.route_url('edit_category')}" method="post">
     <fieldset>
-        <legend>Category Name</legend>
-        <input type="test" name="category_name" value="${category.name}">
+        <legend>${form.delete.label}</legend>
+        %if form.delete.errors:
+            %for error in form.delete.errors:
+            ${error}
+            %endfor
+        %endif
+        ${form.delete()}
     </fieldset>
 
     <fieldset>
-        <legend>Delete Category?</legend>
-        <input type="checkbox" name="delete_category">
+        <legend>${form.name.label}</legend>
+        %if form.name.errors:
+            %for error in form.name.errors:
+            ${error}
+            %endfor
+        %endif
+        %{form.name()}
     </fieldset>
-    <input type="submit" name="submitted" value="Submit Changes">
+
 </form>
 %else:
 The category you specified does not exist. Click

@@ -136,7 +136,6 @@ def new_post(request):
     return {'form': form, 
             'post': post_content} #this should be run through markdown renderer
 
-### TODO: Move to wtforms.
 @view_config(route_name='edit_post', renderer='edit_post.mako',
              permission='edit')
 def edit_post(request):
@@ -144,30 +143,23 @@ def edit_post(request):
     the database. Otherwise, show the edit post form.
     """
 
+    form = PostForm(request.POST)
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
-    if 'submitted' in request.params:
-        post_title = request.params.get('title')
-        post_category = request.params.get('category')
-        post_content = request.params.get('post_content')
-        changed = False
-        if post_title != post.title:
-            changed = True
-            post.title = post_title
-        if post_content != post.post:
-            changed = True
-            post.post = post_content
-        if post_category != post.categoryid:
-            changed = True
-            post.categoryid = post_category
-        if changed:
-            with transaction.manager:
-                DBSession.add(post)
+    if request.POST and form.validate():
+        title = form.title.data
+        category = form.category.data
+        content = form.category.content
+        post.title = title
+        post.post = content
+        post.categoryid = category
+        with transaction.manager:
+            DBSession.add(post)
         return HTTPFound(location=request.route_url('view_post', pid=post_id))
     else:
         categories = DBSession.query(Categories).order_by(Categories.name)
         categories = categories.all()
-        return {'url': request.route_url('edit_post', pid=post_id),
+        return {'form': form,
                 'categories': categories,
                 'post': post}
 

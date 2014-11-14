@@ -222,7 +222,6 @@ def new_category(request):
     else:
         return {'form': form}
 
-### TODO: move to wtforms.
 @view_config(route_name='edit_category', renderer='edit_category.mako',
              permission='admin')
 def edit_category(request):

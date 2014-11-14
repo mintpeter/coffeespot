@@ -149,24 +149,22 @@ def edit_post(request):
     the database. Otherwise, show the edit post form.
     """
 
-    form = PostForm(request.POST)
     post_id = request.matchdict['pid']
     post = DBSession.query(Posts).filter(Posts.id == post_id).first()
+    form = PostForm(request.POST)
     if request.POST and form.validate():
         title = form.title.data
         category = form.category.data
-        content = form.category.content
+        post_content = form.post_content.data
+
         post.title = title
-        post.post = content
+        post.post = post_content
         post.categoryid = category
         with transaction.manager:
             DBSession.add(post)
         return HTTPFound(location=request.route_url('view_post', pid=post_id))
     else:
-        categories = DBSession.query(Categories).order_by(Categories.name)
-        categories = categories.all()
         return {'form': form,
-                'categories': categories,
                 'post': post}
 
 ### wtforms probably wouldn't hurt here either.

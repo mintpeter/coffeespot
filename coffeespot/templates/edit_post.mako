@@ -2,10 +2,8 @@
 
 <%block name="title">edit post</%block>
 
-
-
-%if post:
-<form action="${request.route_url('new_post')}" method="POST">
+% if post:
+<form action="${request.route_url('edit_post')}" method="post">
     <fieldset>
         <legend>${form.title.label}</legend>
         %if form.title.errors:
